@@ -1,8 +1,0 @@
-{
-    "IsEncrypted": false,
-    "Values": {
-        "FUNCTIONS_WORKER_RUNTIME": "python",
-        "AzureWebJobsStorage": "{Azure storage connection string}",
-        "CURRENCY_LAYER_API_KEY": "{your-currencylayer-api-key}"
-    }
-}
