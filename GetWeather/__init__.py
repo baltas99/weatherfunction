@@ -3,25 +3,37 @@ import requests
 import json
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    # Extract the latitude and longitude from the query parameters
-    latitude = req.params.get('latitude')
-    longitude = req.params.get('longitude')
+    # Extract the city name from the query parameters
+    city = req.params.get('city')
 
-    if not latitude or not longitude:
+    if not city:
         return func.HttpResponse(
-            "Please pass both latitude and longitude in the query string",
+            "Please pass the city name in the query string",
             status_code=400
         )
 
-    # Call the Open-Meteo API
-    weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=temperature_2m"
-    response = requests.get(weather_url)
-    data = response.json()
+    # Set your OpenWeatherMap API key
+    api_key = "31061e71138b8a05356fba63f13034f8"
+    # Define the base URL for the OpenWeatherMap API
+    url = "https://api.openweathermap.org/data/2.5/weather"
+    # Set the parameters for the API call
+    params = {"q": city, "appid": api_key, "units": "metric"}
+
+    # Make the API call to OpenWeatherMap
+    response = requests.get(url, params=params)
 
     if response.status_code == 200:
-        return func.HttpResponse(json.dumps(data), mimetype="application/json")
+        weather_data = response.json()
+        # Create a response object with the weather data
+        weather_response = {
+            "Town": city,
+            "Temperature": f"{weather_data['main']['temp']}°C",
+            "Description": weather_data['weather'][0]['description'],
+            "Humidity": f"{weather_data['main']['humidity']}%"
+        }
+        return func.HttpResponse(json.dumps(weather_response), mimetype="application/json")
     else:
         return func.HttpResponse(
-            "Failed to fetch the weather data",
+            f"Failed to fetch the weather data for {city}.",
             status_code=response.status_code
         )
